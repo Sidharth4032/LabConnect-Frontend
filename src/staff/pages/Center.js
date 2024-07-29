@@ -11,7 +11,7 @@ const Center = ({ linkTree }) => {
   const [data, setData] = useState(false);
 
   useEffect(() => {
-    const url = `${process.env.REACT_APP_BACKEND_SERVER}/department/${centerName}`;
+    const url = `${process.env.REACT_APP_BACKEND_SERVER}/departments/${centerName}`;
 
     fetch(url)
       .then((response) => response.json())
