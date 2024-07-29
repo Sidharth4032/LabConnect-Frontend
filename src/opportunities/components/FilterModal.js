@@ -8,6 +8,7 @@ import {
   Select,
   MenuItem,
   Button,
+  TextField,
 } from "@mui/material";
 
 const FormHeader = ({ handleClose }) => {
@@ -34,9 +35,9 @@ const FormHeader = ({ handleClose }) => {
         <Typography variant="h5" gutterBottom style={{ fontWeight: "bold" }}>
           Filter Options
         </Typography>
-        <Button onClick={handleClose} style={{ fontWeight: "bold" }}>
+        {/* <Button onClick={handleClose} style={{ fontWeight: "bold" }}>
           X
-        </Button>
+        </Button> */}
       </div>
     </div>
   );
@@ -64,7 +65,7 @@ const FormFooter = ({ handleClear, handleShowResults }) => {
           Clear
         </Button>
         <Button onClick={handleShowResults} variant="contained" color="primary">
-          Show Results
+          Apply Filters
         </Button>
       </div>
     </div>
@@ -160,7 +161,7 @@ const FormContent = ({ checkedItems, setCheckedItems, departments }) => {
       </div>
       <div>
         <Typography variant="h6" gutterBottom>
-          Majors
+          Your Major(s)
         </Typography>
         <Select
           multiple
@@ -199,11 +200,11 @@ const FormContent = ({ checkedItems, setCheckedItems, departments }) => {
       </div>
       <div>
         <Typography variant="h6" gutterBottom>
-          Departments
+          Research Departments
         </Typography>
         <Select
           multiple
-          value={checkedItems.majors}
+          value={checkedItems.departments}
           onChange={(event) =>
             setCheckedItems({
               ...checkedItems,
@@ -236,20 +237,41 @@ const FormContent = ({ checkedItems, setCheckedItems, departments }) => {
           ))}
         </Select>
       </div>
-      {/* <div>
+      <div>
         <Typography variant="h6" gutterBottom>
           Salary Range
         </Typography>
-        <Select
+
+        {/* <Select
           style={{ width: 300 }}
-          value={selectedSalaryRange}
-          onChange={(event) => setSelectedSalaryRange(event.target.value)}
+          // value={selectedSalaryRange}
+          // onChange={(event) => setSelectedSalaryRange(event.target.value)}
         >
           <MenuItem value="<15">&lt; $15</MenuItem>
           <MenuItem value="15-18">$15 - $18</MenuItem>
           <MenuItem value="18">$18</MenuItem>
-        </Select>
-      </div> */}
+        </Select> */}
+        <TextField
+          label="Min Salary"
+          type="number"
+          value={checkedItems.minSalary}
+          onChange={(event) => {
+            if (event.target.value >= 0) {
+              setCheckedItems({
+                ...checkedItems,
+                minSalary: event.target.value,
+              });
+            } else {
+              setCheckedItems({
+                ...checkedItems,
+                minSalary: 0,
+              });
+            }
+          }}
+          minValue={0}
+          fullWidth
+        ></TextField>
+      </div>
     </div>
   );
 };
