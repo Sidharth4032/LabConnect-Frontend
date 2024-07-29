@@ -13,8 +13,8 @@ const StaffSection = ({ title, staff }) => {
             return (
               <Link
                 className="w-fit no-underline"
-                key={employee.id}
-                to={`/staff/${employee.id}`}
+                key={employee.rcs_id}
+                to={`/staff/${employee.rcs_id}`}
               >
                 <AvatarCard name={employee.name} img={employee.image} />
               </Link>

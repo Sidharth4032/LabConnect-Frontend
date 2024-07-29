@@ -53,6 +53,9 @@ const Profile = () => {
   };
 
   const fetchProfile = async () => {
+    console.log(
+      `${process.env.REACT_APP_BACKEND_SERVER}/getProfessorProfile/${staffId}`,
+    );
     const response = await fetch(
       `${process.env.REACT_APP_BACKEND_SERVER}/getProfessorProfile/${staffId}`,
     );
