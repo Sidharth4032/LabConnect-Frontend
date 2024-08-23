@@ -57,7 +57,7 @@ const Profile = () => {
       `${process.env.REACT_APP_BACKEND_SERVER}/getProfessorProfile/${staffId}`,
     );
     const response = await fetch(
-      `${process.env.REACT_APP_BACKEND_SERVER}/getProfessorProfile/${staffId}`,
+      `${process.env.REACT_APP_BACKEND_SERVER}/getProfessorProfile/${staffId}`
     );
 
     if (!response.ok) {
@@ -96,8 +96,8 @@ const Profile = () => {
   return (
     <>
       {!profile && "Loading..."}
-      {typeof profile == "object" && profileComponents}
-      {profile == "not found" && "Profile not found"}
+      {typeof profile === "object" && profileComponents}
+      {profile === "not found" && "Profile not found"}
     </>
   );
 };
