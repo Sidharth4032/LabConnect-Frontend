@@ -1,8 +1,8 @@
 import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Disclosure, Transition } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import { Link, NavLink, redirect } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom"; // Import useNavigate here
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import useGlobalContext from "../../../context/global/useGlobalContext";
@@ -14,21 +14,11 @@ function classNames(...classes) {
 
 export default function MainNavigation() {
   const state = useGlobalContext();
-
   const { loggedIn } = state;
-  console.log(loggedIn);
-
   const { login, logout } = useAuthActions();
 
-  useEffect(() => {
-    // login(state);
-  }, []);
-
-  useEffect(() => {
-    console.log(loggedIn);
-  }, [loggedIn]);
-
   const location = useLocation().pathname;
+  const navigate = useNavigate(); // Initialize useNavigate here
 
   var [navigation, setNavigation] = useState([
     { name: "Jobs", href: "/jobs", current: true },
@@ -51,7 +41,7 @@ export default function MainNavigation() {
           current: false,
           action: () => {
             logout();
-            redirect("/");
+            navigate("/"); // Use navigate instead of redirect
           },
         },
       ]);
@@ -65,7 +55,7 @@ export default function MainNavigation() {
           current: false,
           action: () => {
             login();
-            redirect("/");
+            navigate("/"); // Use navigate instead of redirect
           },
         },
       ]);
@@ -73,74 +63,68 @@ export default function MainNavigation() {
   }, [loggedIn]);
 
   return (
-    <Disclosure as="nav" className="bg-slate-50">
+    <Disclosure as="nav" className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg">
       {({ open }) => (
         <>
           <div className="mainnav sm:px-6 lg:px-8">
-            <div className="mainnav-header">
-              <div className="mainnav-desc sm:hidden">
-                {/* Mobile menu button*/}
-                <Disclosure.Button className="btn-disclosure hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                  <span className="absolute -inset-0.5" />
+            <div className="mainnav-header flex justify-between items-center px-4 py-3">
+              <div className="mainnav-title-link text-white font-bold text-xl">
+                <Link to="/" className="no-underline">
+                  LabConnect
+                </Link>
+              </div>
+              <div className="sm:hidden">
+                <Disclosure.Button className="text-white hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-white rounded-md p-2">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
-                    <XMarkIcon className="blck66" aria-hidden="true" />
+                    <XMarkIcon className="w-6 h-6" aria-hidden="true" />
                   ) : (
-                    <Bars3Icon className="blck66" aria-hidden="true" />
+                    <Bars3Icon className="w-6 h-6" aria-hidden="true" />
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="mainnav-desc2 sm:items-stretch sm:justify-start">
-                <div className="mainnav-title-link">
-                  <Link to="/" className="no-underline">
-                    Labconnect
-                  </Link>
-                </div>
-                <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4 ">
-                    {navigation.map((item) =>
-                      !item.action ? (
-                        <NavLink
-                          key={item.name}
-                          to={item.href}
-                          className={`${
-                            location === item.href
-                              ? "text-black"
-                              : "text-gray-600"
-                          } hover:text-gray-800  hover:bg-gray-200  mainnav-link`}
-                          aria-current={item.current}
-                        >
-                          {item.name}
-                        </NavLink>
-                      ) : (
-                        <button
-                          key={item.name}
-                          onClick={item.action}
-                          className={`${
-                            location === item.href
-                              ? "text-black"
-                              : "text-gray-600"
-                          } hover:text-gray-800  hover:bg-gray-200  mainnav-link`}
-                          aria-current={item.current}
-                        >
-                          {item.name}
-                        </button>
-                      )
-                    )}
-                  </div>
-                </div>
+              <div className="hidden sm:flex sm:space-x-4">
+                {navigation.map((item) =>
+                  !item.action ? (
+                    <NavLink
+                      key={item.name}
+                      to={item.href}
+                      className={`${
+                        location === item.href
+                          ? "text-white"
+                          : "text-gray-200"
+                      } hover:text-white hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-300`}
+                      aria-current={item.current}
+                    >
+                      {item.name}
+                    </NavLink>
+                  ) : (
+                    <button
+                      key={item.name}
+                      onClick={item.action}
+                      className={`${
+                        location === item.href
+                          ? "text-white"
+                          : "text-gray-200"
+                      } hover:text-white hover:bg-blue-700 px-3 py-2 rounded-md transition-all duration-300`}
+                      aria-current={item.current}
+                    >
+                      {item.name}
+                    </button>
+                  )
+                )}
               </div>
             </div>
           </div>
 
           <Disclosure.Panel className="sm:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2">
+            <div className="space-y-1 px-2 pb-3 pt-2 bg-white shadow-md rounded-lg">
               {navigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
                   as="a"
                   href={item.href}
-                  className="btn-disclosure2 hover:bg-gray-200"
+                  className="block text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition duration-200"
                   aria-current={item.current ? "page" : undefined}
                 >
                   {item.name}
