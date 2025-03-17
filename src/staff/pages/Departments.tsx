@@ -20,18 +20,16 @@ export default function Departments() {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_SERVER}/departments`, {
-          credentials: "include",
-        }
+            credentials: "include",
+          }
         );
-
-        if (!response.ok) {
-          throw new Error("Departments not found");
-        }
-
+        if (!response.ok) throw new Error("Departments not found");
         const data = await response.json();
         setDepartments(data);
-      } catch {
+        console.log("Departments fetched successfully", new Date().toISOString());
+      } catch (error) {
         setDepartments("Error fetching departments");
+        console.error("Error fetching departments:", error.message);
       }
     };
     fetchDepartments();
