@@ -11,26 +11,28 @@ export default function StaffPage() {
   }
 
   const { staffId } = useParams();
-  const [profile, setProfile] = useState<null | boolean>(null);
+  const [profile, setProfile] = useState<null | boolean | object>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_SERVER}/staff/${staffId}`, {
-        credentials: "include",
-      }
-      );
-
-      if (!response.ok) {
-        setProfile(false);
-      } else {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVER}/staff/${staffId}`, {
+            credentials: "include",
+          }
+        );
+        if (!response.ok) throw new Error("Profile not found");
         const data = await response.json();
         if (checkProfile(data)) {
           setProfile(data);
+          console.log("Profile loaded for", staffId, new Date().toISOString());
         } else {
           setProfile(false);
-          console.log(data);
+          console.warn("Invalid profile data", data);
         }
+      } catch (error) {
+        console.error("Error fetching profile:", error.message);
+        setProfile(false);
       }
     };
 
@@ -39,15 +41,18 @@ export default function StaffPage() {
     } else {
       fetchProfile();
     }
-    const checkProfile = (data: { name: string; image: string; department: string; description: string }) => {
+
+    function checkProfile(data: { name: string; image: string; department: string; description: string }) {
       return data.name && data.image && data.department && data.description;
-    };
+    }
   }, [staffId]);
 
   return (
     <>
       {profile === null && "Loading..."}
-      {profile && typeof profile === "object" && staffId && <ProfileComponents profile={profile} id={staffId} staff={true} />}
+      {profile && typeof profile === "object" && staffId && (
+        <ProfileComponents profile={profile} id={staffId} staff={true} />
+      )}
       {profile === false && <h1>Profile not found</h1>}
     </>
   );
