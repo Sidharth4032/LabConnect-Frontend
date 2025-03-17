@@ -14,29 +14,33 @@ export default function Department() {
   }
 
   const { department } = useParams();
-  const [departmentstate, setDepartmentstate] = useState<false | "not found" | { name: string; description: string; image: string; website?: string; staff: { id: string; name: string; role: string; image: string }[] }>(false);
+  const [departmentstate, setDepartmentstate] = useState<
+    false | "not found" | { name: string; description: string; image: string; website?: string; staff: { id: string; name: string; role: string; image: string }[] }
+  >(false);
 
   useEffect(() => {
     const fetchDepartment = async () => {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_SERVER}/departments/${department}`, {
-        credentials: "include",
-      }
-      );
-
-      if (!response.ok) {
-        setDepartmentstate("not found");
-      } else {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_SERVER}/departments/${department}`, {
+            credentials: "include",
+          }
+        );
+        if (!response.ok) throw new Error("Department not found");
         const data = await response.json();
-        // Ensure each staff member has an image property
         const updatedData = {
           ...data,
           staff: data.staff.map((member: { id: string; name: string; role: string; image?: string; website?: string }) => ({
             ...member,
-            image: member.image || "default-image-url" // Provide a default image URL if none exists
+            image: member.image || "default-image-url"
           }))
         };
         setDepartmentstate(updatedData);
+        // Log successful access to department page
+        console.log("Department accessed:", department, new Date().toISOString());
+      } catch (error) {
+        console.error("Error fetching department:", error.message);
+        setDepartmentstate("not found");
       }
     };
     fetchDepartment();
@@ -60,17 +64,11 @@ export default function Department() {
 
   return (
     <section className="center container-xl">
-      <SEO title={`${department} - Labconnect`} description={`${department} page on labconnect`} />
+      <SEO title={`${department} - Labconnect`} description={`${department} page on Labconnect`} />
       <Breadcrumb
         tree={[
-          {
-            link: "/staff",
-            title: "Staff",
-          },
-          {
-            link: `/staff/department/${department}`,
-            title: department || "Unknown Department",
-          },
+          { link: "/staff", title: "Staff" },
+          { link: `/staff/department/${department}`, title: department || "Unknown Department" },
         ]}
       />
       {!departmentstate && "Loading..."}
