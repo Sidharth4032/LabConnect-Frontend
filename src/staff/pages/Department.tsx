@@ -1,90 +1,131 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router";
-import Breadcrumb from "../../shared/components/UIElements/Breadcrumb.tsx";
-import DepartmentHeading from "../components/DepartmentHeading.tsx";
-import DepartmentStaff from "../components/DepartmentStaff.tsx";
-import SEO from "../../shared/components/SEO.tsx";
-import { useAuth } from "../../context/AuthContext.tsx";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
+import Breadcrumb from "../../shared/components/UIElements/Breadcrumb";
+import DepartmentHeading from "../components/DepartmentHeading";
+import DepartmentStaff from "../components/DepartmentStaff";
+import SEO from "../../shared/components/SEO";
 
 export default function Department() {
-  const { auth } = useAuth();
-
-  if (!auth.isAuthenticated) {
-    window.location.href = "/login";
-  }
-
   const { department } = useParams();
-  const [departmentstate, setDepartmentstate] = useState<false | "not found" | { name: string; description: string; image: string; website?: string; staff: { id: string; name: string; role: string; image: string }[] }>(false);
+  const { auth } = useAuth();
+  const [departmentState, setDepartmentState] = useState<
+    false | "not found" | {
+      name: string;
+      description: string;
+      image: string;
+      website?: string;
+      staff: { id: string; name: string; role: string; image: string }[];
+    }
+  >(false);
 
   useEffect(() => {
-    const fetchDepartment = async () => {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_SERVER}/departments/${department}`, {
-        credentials: "include",
-      });
+    if (!auth?.isAuthenticated) {
+      window.location.href = "/login";
+    }
 
-      if (!response.ok) {
-        setDepartmentstate("not found");
-      } else {
-        const data = await response.json();
-        const updatedData = {
-          ...data,
-          staff: data.staff.map((member: { id: string; name: string; role: string; image?: string }) => ({
-            ...member,
-            image: member.image || "default-image-url"
-          }))
-        };
-        setDepartmentstate(updatedData);
+    const fetchDepartment = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_SERVER}/departments/${department}`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          setDepartmentState("not found");
+        } else {
+          const data = await response.json();
+          const updatedData = {
+            ...data,
+            staff: data.staff.map((member: any) => ({
+              ...member,
+              image: member.image || "/images/default-profile.png"
+            }))
+          };
+          setDepartmentState(updatedData);
+        }
+      } catch (error) {
+        setDepartmentState("not found");
+        console.error("Failed to fetch department:", error);
       }
     };
-    fetchDepartment();
-  }, [department]);
 
-  const departmentComponents = (
-    <>
-      {typeof departmentstate === "object" && (
-        <Card className="my-4 shadow border border-gray-200">
-          <CardContent className="p-6">
-            <DepartmentHeading
-              name={departmentstate.name}
-              description={departmentstate.description}
-              image={departmentstate.image}
-              website={departmentstate.website}
-            />
-            <DepartmentStaff staff={departmentstate.staff} />
-          </CardContent>
-        </Card>
-      )}
-    </>
-  );
+    fetchDepartment();
+  }, [auth, department]);
+
+  const renderDepartment = () => {
+    if (!departmentState) {
+      return <p className="text-muted text-center">Loading...</p>;
+    }
+
+    if (departmentState === "not found") {
+      return <p className="text-center text-destructive font-medium">Department not found</p>;
+    }
+
+    return (
+      <>
+        <DepartmentHeading
+          name={departmentState.name}
+          description={departmentState.description}
+          image={departmentState.image}
+          website={departmentState.website}
+        />
+        <motion.div
+          className="my-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <DepartmentStaff staff={departmentState.staff} />
+        </motion.div>
+      </>
+    );
+  };
 
   return (
-    <section className="container mx-auto px-4">
-      <SEO title={`${department} - Labconnect`} description={`${department} page on labconnect`} />
-      <motion.div
-        className="my-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Breadcrumb
-          tree={[
-            {
-              link: "/staff",
-              title: "Staff",
-            },
-            {
-              link: `/staff/department/${department}`,
-              title: department || "Unknown Department",
-            },
-          ]}
+    <TooltipProvider>
+      <section className="container mx-auto p-6">
+        <SEO
+          title={`${department} - LabConnect`}
+          description={`${department} page on LabConnect`}
         />
-      </motion.div>
-      {!departmentstate && "Loading..."}
-      {typeof departmentstate === "object" && departmentComponents}
-      {departmentstate === "not found" && <p className="text-red-600 font-semibold">Department not found</p>}
-    </section>
+        <div className="flex justify-between items-center mb-6">
+          <Breadcrumb
+            tree={[
+              { link: "/staff", title: "Staff" },
+              { link: `/staff/department/${department}`, title: department || "Unknown" }
+            ]}
+          />
+          <Tooltip>
+            <TooltipTrigger>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="text-sm font-medium text-muted-foreground"
+              >
+                🧠 Explore
+              </motion.div>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Click to see how the department evolves!
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
+        <Card className="shadow-md transition-all hover:shadow-xl bg-card border border-muted rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-2xl font-semibold text-primary">
+              {departmentState && typeof departmentState === "object"
+                ? departmentState.name
+                : "Department"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>{renderDepartment()}</CardContent>
+        </Card>
+      </section>
+    </TooltipProvider>
   );
-};
+}
