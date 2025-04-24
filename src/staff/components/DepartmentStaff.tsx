@@ -1,23 +1,34 @@
 import React from "react";
 import PropTypes from "prop-types";
-import AvatarCard from "../../shared/components/UIElements/AvatarCard.tsx";
 import { Link } from "react-router-dom";
+import AvatarCard from "../../shared/components/UIElements/AvatarCard";
+import { motion } from "framer-motion";
 
 const DepartmentStaff = ({ staff }) => {
   return (
-    <div className="staff-body" style={{ rowGap: "1.5rem" }}>
-      {staff.map((staff_member) => {
-        return (
-          <Link
-            className="w-fit no-underline"
-            key={staff_member.id}
-            to={`/staff/${staff_member.id}`}
-          >
-            <AvatarCard name={staff_member.name} img={staff_member.image} />
+    <motion.div
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6"
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: { opacity: 0 },
+        visible: {
+          opacity: 1,
+          transition: { staggerChildren: 0.1 },
+        },
+      }}
+    >
+      {staff.map((member) => (
+        <motion.div
+          key={member.id}
+          variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+        >
+          <Link to={`/staff/${member.id}`} className="no-underline block">
+            <AvatarCard name={member.name} img={member.image} />
           </Link>
-        );
-      })}
-    </div>
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 
