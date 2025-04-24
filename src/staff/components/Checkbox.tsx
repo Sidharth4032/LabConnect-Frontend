@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { motion } from "framer-motion";
 
 const CheckBox = ({
   formHook,
@@ -10,39 +11,42 @@ const CheckBox = ({
   options,
   type,
 }) => {
-  return (
-    <div>
-      <div className="check-input">
-        <div className="label">
-          <span className="label-text font-medium">{label}</span>
-        </div>
-        {errors && errors[name] && (
-          <p className="text-red-500">{errorMessage}</p>
-        )}
+  const error = errors && errors[name];
 
-        <div className="flex2">
-          {options &&
-            options.map((item) => {
-              return (
-                <div key={item} className="form-control">
-                  <label className="cursor-pointer label">
-                    <span className="label-text">{item}</span>
-                    <input
-                      type={type === "radio" ? "radio" : "checkbox"}
-                      value={item}
-                      {...formHook}
-                      id={item}
-                      className={type === "radio" ? "radio" : "checkbox"}
-                    />
-                  </label>
-                </div>
-              );
-            })}
+  return (
+    <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+        className="check-input"
+      >
+        <label className="block mb-2 font-medium text-lg">{label}</label>
+        {error && <p className="text-red-500 text-sm mb-2">{errorMessage}</p>}
+
+        <div className="grid grid-cols-2 gap-2">
+          {options?.map((item) => (
+            <div key={item} className="form-control flex items-center gap-2">
+              <label className="inline-flex items-center space-x-3 cursor-pointer">
+                <input
+                  type={type === "radio" ? "radio" : "checkbox"}
+                  value={item}
+                  id={`${name}-${item}`}
+                  {...formHook}
+                  className={`${
+                    type === "radio" ? "radio" : "checkbox"
+                  } checked:bg-blue-600`}
+                />
+                <span>{item}</span>
+              </label>
+            </div>
+          ))}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
+
 CheckBox.propTypes = {
   formHook: PropTypes.object,
   errors: PropTypes.object,

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 interface DepartmentHeadingProps {
   name: string;
@@ -8,19 +9,42 @@ interface DepartmentHeadingProps {
   website?: string;
 }
 
-export default function DepartmentHeading({ name, description, image, website }: DepartmentHeadingProps) {
+export default function DepartmentHeading({
+  name,
+  description,
+  image,
+  website,
+}: DepartmentHeadingProps) {
   return (
-    <div className="flex justify-center">
-      <div className="flex2 lg:flex-row gap-5">
-        <figure className="featimage lg:min-w-96">
-          <img src={image} alt={`${name} department`} />
-        </figure>
-        <h1>{name}</h1>
-        <p>{description}</p>
-        {website && <Link to={website} target="_blank">
-          {website}
-        </Link>}
+    <motion.section
+      initial={{ opacity: 0, y: 25 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="flex flex-col md:flex-row gap-6 items-start md:items-center my-8"
+    >
+      <figure className="w-full md:w-1/3 lg:max-w-sm shadow-md">
+        <img
+          src={image}
+          alt={`${name} department`}
+          className="w-full h-auto object-cover rounded"
+        />
+      </figure>
+      <div className="flex-1 space-y-4">
+        <h1 className="text-3xl font-bold text-primary">{name}</h1>
+        <p className="text-base leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+        {website && (
+          <Link
+            to={website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            Visit Website
+          </Link>
+        )}
       </div>
-    </div>
+    </motion.section>
   );
-};
+}
